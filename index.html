@@ -135,14 +135,24 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
 /* mobile */
 @media(max-width:768px){
   .app{flex-direction:column}
-  .sidebar{width:100%;flex:none;height:auto;position:fixed;bottom:0;left:0;right:0;flex-direction:row;
-    overflow-x:auto;padding:6px 8px;z-index:40;border-right:none;border-top:1px solid var(--line);
-    background:rgba(255,255,255,.92)}
+  /* 关键修复 1：桌面为 position:sticky;top:0，改用 fixed 时必须显式重置 top:auto，
+     否则 top:0 与 bottom:0 同时生效、height:auto 会被拉伸为整屏高（真机绿屏根因）。 */
+  .sidebar{width:100%;flex:none;height:auto;position:fixed;top:auto;bottom:0;left:0;right:0;
+    flex-direction:row;align-items:center;justify-content:flex-start;
+    overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+    padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));
+    z-index:40;border-right:none;border-top:1px solid var(--line);
+    background:rgba(255,255,255,.96)}
+  .sidebar::-webkit-scrollbar{display:none}
   .brand{display:none}
-  .nav-btn{flex:0 0 auto;flex-direction:column;gap:3px;font-size:11px;padding:6px 10px;margin:0}
-  .nav-btn svg{width:20px;height:20px}
+  /* 关键修复 2：桌面 .nav-btn{width:100%} 会让单个按钮占满整行；
+     移动端显式覆盖为 width:auto + 固定最小宽度，flex 不放大不缩小，保证单行横排。 */
+  .nav-btn{flex:0 0 auto;width:auto;min-width:64px;flex-direction:column;gap:3px;font-size:11px;
+    padding:6px 10px;margin:0;align-items:center;justify-content:center;white-space:nowrap}
+  .nav-btn svg{width:20px;height:20px;flex:0 0 20px}
   .sync{display:none}
-  .main{padding:14px 14px 86px}
+  /* 关键修复 3：正文底部预留足够空间（导航高度 + 安全区），输入框/添加按钮不被遮挡 */
+  .main{padding:14px 14px calc(88px + env(safe-area-inset-bottom,0px))}
   .topbar h1{font-size:17px}
   .row>*{flex:1 1 100%}
 }
@@ -156,7 +166,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
 /* toast */
 .toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);max-width:92%;background:rgba(40,60,40,.94);color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;z-index:70;display:none;box-shadow:var(--shadow);text-align:center;line-height:1.55;white-space:pre-line}
 .toast.show{display:block;animation:fade .2s}
-@media(max-width:768px){.update-bar{top:auto;bottom:62px}}
+@media(max-width:768px){.update-bar{top:auto;bottom:calc(64px + env(safe-area-inset-bottom,0px))}.toast{bottom:calc(92px + env(safe-area-inset-bottom,0px))}}
 </style>
 </head>
 <body>

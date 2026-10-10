@@ -1,4 +1,4 @@
-const CACHE = 'garden-of-rain-v1';
+const CACHE = 'garden-of-rain-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -16,11 +16,15 @@ self.addEventListener('install', e => {
   );
 });
 
-// Activate: drop every cache that is no longer current.
+// Activate: drop ONLY our own outdated caches (prefix garden-of-rain-).
+// Never touch other same-origin apps' caches.
+const CACHE_PREFIX = 'garden-of-rain-';
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(keys => Promise.all(
+        keys.filter(k => k.startsWith(CACHE_PREFIX) && k !== CACHE).map(k => caches.delete(k))
+      ))
       .then(() => self.clients.claim())
   );
 });
